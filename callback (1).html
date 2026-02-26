@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Connecting — Rebel Growth Labs</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;700&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --purple:#8B5CF6; --purple-2:#B000E8; --gold:#F5C542;
+  --teal:#06B6D4; --coral:#E74C3C; --green:#2A7A4B;
+  --bg:#000000; --navy:#0F172A; --divider:#1E2D3D;
+  --slate:#64748B; --white:#FFFFFF;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body {
+  font-family:'DM Sans',sans-serif;
+  background:var(--bg); color:var(--white);
+  min-height:100vh; display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  overflow:hidden;
+}
+.glow { position:fixed; border-radius:50%; pointer-events:none; filter:blur(80px); }
+.glow-1 { top:-200px; right:-200px; width:600px; height:600px; background:rgba(139,92,246,0.12); }
+.glow-2 { bottom:-200px; left:-200px; width:500px; height:500px; background:rgba(176,0,232,0.08); }
+
+.card {
+  position:relative; z-index:1;
+  max-width:460px; width:90%;
+  border:1px solid var(--divider);
+  border-radius:3px; padding:48px 40px;
+  background:rgba(255,255,255,0.02);
+  text-align:center;
+}
+
+.spinner-wrap { margin-bottom:28px; }
+
+.spinner {
+  width:56px; height:56px; border-radius:50%;
+  border:2px solid var(--divider);
+  border-top-color:var(--purple);
+  animation:spin 0.8s linear infinite;
+  margin:0 auto;
+}
+
+@keyframes spin { to { transform:rotate(360deg); } }
+
+.status-icon {
+  width:56px; height:56px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-size:26px; margin:0 auto 28px;
+  display:none;
+}
+
+.status-icon.success-icon { background:rgba(42,122,75,0.12); border:1px solid rgba(42,122,75,0.3); }
+.status-icon.error-icon { background:rgba(231,76,60,0.1); border:1px solid rgba(231,76,60,0.25); }
+
+h2 {
+  font-family:'DM Serif Display',serif;
+  font-size:26px; margin-bottom:12px;
+}
+
+.msg { font-size:14px; color:rgba(255,255,255,0.5); line-height:1.65; font-weight:300; }
+.msg strong { color:var(--white); font-weight:500; }
+
+.progress-steps { display:flex; flex-direction:column; gap:10px; margin-top:28px; text-align:left; }
+
+.prog-step {
+  display:flex; align-items:center; gap:12px;
+  font-size:13px; color:var(--slate);
+  transition:color 0.3s;
+}
+
+.prog-step.active { color:var(--white); }
+.prog-step.complete { color:#7DD4A8; }
+
+.prog-dot {
+  width:8px; height:8px; border-radius:50%;
+  background:var(--divider); flex-shrink:0;
+  transition:background 0.3s;
+}
+
+.prog-step.active .prog-dot { background:var(--purple); box-shadow:0 0 8px rgba(139,92,246,0.5); }
+.prog-step.complete .prog-dot { background:#2A7A4B; }
+
+.back-btn {
+  display:inline-flex; align-items:center; gap:6px;
+  margin-top:24px; padding:10px 20px;
+  border:1px solid var(--divider); border-radius:3px;
+  font-family:'DM Sans',sans-serif; font-weight:600;
+  font-size:13px; color:var(--slate);
+  cursor:pointer; background:transparent;
+  text-decoration:none; transition:all 0.2s;
+  display:none;
+}
+
+.back-btn:hover { border-color:var(--slate); color:var(--white); }
+
+.brand {
+  position:fixed; top:18px; left:40px;
+  display:flex; align-items:center; gap:10px; z-index:10;
+}
+.brand svg { width:28px; height:28px; }
+.brand-name { font-family:'DM Sans',sans-serif; font-weight:700; font-size:11px; letter-spacing:0.12em; text-transform:uppercase; }
+.brand-name span { color:var(--purple); }
+</style>
+</head>
+<body>
+
+<div class="glow glow-1"></div>
+<div class="glow glow-2"></div>
+
+<div class="brand">
+  <svg viewBox="0 0 32 32" fill="none">
+    <ellipse cx="16" cy="16" rx="13" ry="6" stroke="#8B5CF6" stroke-width="1.5"/>
+    <ellipse cx="16" cy="16" rx="13" ry="6" stroke="#8B5CF6" stroke-width="1.5" transform="rotate(60 16 16)"/>
+    <ellipse cx="16" cy="16" rx="13" ry="6" stroke="#8B5CF6" stroke-width="1.5" transform="rotate(120 16 16)"/>
+    <circle cx="16" cy="16" r="2.5" fill="#8B5CF6"/>
+  </svg>
+  <div class="brand-name">REBEL GROWTH <span>LABS</span></div>
+</div>
+
+<div class="card">
+  <div class="spinner-wrap">
+    <div class="spinner" id="spinner"></div>
+    <div class="status-icon success-icon" id="icon-success">✅</div>
+    <div class="status-icon error-icon" id="icon-error">⚠️</div>
+  </div>
+
+  <h2 id="title">Connecting Your Account</h2>
+  <p class="msg" id="msg">Securely exchanging your authorization. This takes just a moment.</p>
+
+  <div class="progress-steps" id="prog-steps">
+    <div class="prog-step active" id="ps-1">
+      <div class="prog-dot"></div>
+      <span>Receiving authorization code</span>
+    </div>
+    <div class="prog-step" id="ps-2">
+      <div class="prog-dot"></div>
+      <span>Exchanging for access token</span>
+    </div>
+    <div class="prog-step" id="ps-3">
+      <div class="prog-dot"></div>
+      <span>Delivering to Rebel Growth Labs</span>
+    </div>
+  </div>
+
+  <a class="back-btn" id="back-btn" href="/">← Start Over</a>
+</div>
+
+<script>
+  const FORMSPREE   = 'https://formspree.io/f/mykdokqb';
+  const BASE_URL    = 'https://rgl-client-intake-iyn1.vercel.app';
+
+  const params      = new URLSearchParams(window.location.search);
+  const code        = params.get('code');
+  const state       = params.get('state');
+  const error       = params.get('error');
+  // localStorage persists across OAuth redirects — sessionStorage does not
+  const storedState = localStorage.getItem('oauth_state');
+
+  function setStep(num) {
+    for(let i=1;i<=3;i++){
+      const el = document.getElementById('ps-'+i);
+      if(i < num) { el.classList.remove('active'); el.classList.add('complete'); }
+      else if(i === num) { el.classList.add('active'); }
+    }
+  }
+
+  function showError(message) {
+    document.getElementById('spinner').style.display = 'none';
+    document.getElementById('icon-error').style.display = 'flex';
+    document.getElementById('prog-steps').style.display = 'none';
+    document.getElementById('title').textContent = 'Something Went Wrong';
+    document.getElementById('msg').innerHTML = message;
+    document.getElementById('back-btn').style.display = 'inline-flex';
+  }
+
+  function showSuccess(platform, platformKey) {
+    document.getElementById('spinner').style.display = 'none';
+    document.getElementById('icon-success').style.display = 'flex';
+    setStep(4);
+    document.getElementById('title').textContent = 'Connected!';
+    document.getElementById('msg').innerHTML = `Your <strong>${platform}</strong> account is connected. Redirecting you back...`;
+    // Set connected flag in localStorage BEFORE redirect so index.html reads it correctly
+    localStorage.setItem(platformKey + '_connected', 'true');
+    localStorage.removeItem('oauth_state');
+    setTimeout(() => { window.location.href = '/'; }, 2000);
+  }
+
+  async function sendToFormspree(platform, code, state) {
+    const data = new FormData();
+    data.append('_subject', `\uD83D\uDD11 OAuth Code \u2014 Body Shop Wellness \u2014 ${platform}`);
+    data.append('client', 'Jacob Stahler \u2014 Body Shop Wellness');
+    data.append('platform', platform);
+    data.append('auth_code', code);
+    data.append('state', state);
+    data.append('redirect_uri', BASE_URL + '/callback');
+    data.append('received_at', new Date().toISOString());
+    data.append('note', `Exchange this code for an access token. App secret is in .env. Redirect URI: ${BASE_URL}/callback`);
+
+    const res = await fetch(FORMSPREE, {
+      method: 'POST',
+      body: data,
+      headers: { 'Accept': 'application/json' }
+    });
+
+    return res.ok;
+  }
+
+  async function handleCallback() {
+    if (error) {
+      showError(`Authorization was declined or cancelled.<br><br>Error: <strong>${error}</strong><br><br>Please try again.`);
+      return;
+    }
+
+    if (!code) {
+      showError('No authorization code received. Please try connecting again.');
+      return;
+    }
+
+    // Verify state parameter to prevent CSRF attacks
+    if (!state || !storedState || state !== storedState) {
+      showError('Security check failed (state mismatch). Please start over for your protection.');
+      return;
+    }
+
+    // Determine platform from state prefix
+    const platform    = state.startsWith('meta') ? 'Meta / Facebook' : 'Square';
+    const platformKey = state.startsWith('meta') ? 'meta' : 'square';
+
+    setStep(2);
+    await sleep(600);
+    setStep(3);
+    await sleep(600);
+
+    try {
+      const sent = await sendToFormspree(platform, code, state);
+      if (sent) {
+        setStep(4);
+        await sleep(400);
+        showSuccess(platform, platformKey);
+      } else {
+        showError('Failed to deliver credentials. Please try again or email <strong>acesa@rebelgrowthlabs.com</strong> directly.');
+      }
+    } catch(e) {
+      showError('Network error. Please check your connection and try again.');
+    }
+  }
+
+  function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+  handleCallback();
+</script>
+</body>
+</html>
